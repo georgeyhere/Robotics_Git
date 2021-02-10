@@ -30,8 +30,9 @@ if clientID!=-1: # server connected
         print('Remote API function call returned with error code: ',res)
     
     executedMovId='notReady' 
-    targetArm='UR3' 
-    stringSignalName=targetArm+'_executedMovId'
+    targetArm1='UR3' 
+    stringSignalName=targetArm1+'_executedMovId'
+    
     
     def waitForMovementExecuted(id): # checks if returned code is same as executed movement to determine if movement has been executed
         global executedMovId
@@ -62,85 +63,98 @@ if clientID!=-1: # server connected
     
     # Send first movement sequence:
     # Go to center of cuboid
-    targetConfig=[90*math.pi/180,90*math.pi/180,0,0,0,0]
-    targetVel=[-20*math.pi/180,-20*math.pi/180,0,0,0,0]
+    targetConfig=[-16*math.pi/180,37*math.pi/180,100*math.pi/180,-50*math.pi/180,-90*math.pi/180,0]
+    targetVel=[-0.5*math.pi/180,-0.5*math.pi/180,-0.5*math.pi/180,-0.5*math.pi/180,-0.5*math.pi/180,-0.5*math.pi/180]
     movementData={"id":"movSeq1","type":"mov","targetConfig":targetConfig,"targetVel":targetVel,"maxVel":maxVel,"maxAccel":maxAccel}
     packedMovementData=msgpack.packb(movementData)
-    sim.simxCallScriptFunction(clientID,targetArm,sim.sim_scripttype_childscript,'legacyRapiMovementDataFunction',[],[],[],packedMovementData,sim.simx_opmode_oneshot)    
+    sim.simxCallScriptFunction(clientID,targetArm1,sim.sim_scripttype_childscript,'legacyRapiMovementDataFunction',[],[],[],packedMovementData,sim.simx_opmode_oneshot)    
     
     
     # Send second movement sequence:
     # Go to Corner 1
-    targetConfig=[90*math.pi/180,90*math.pi/180,0,0,0,0]
-    targetVel=[-20*math.pi/180,-20*math.pi/180,0,0,0,0]
+    targetConfig=[-9*math.pi/180,46*math.pi/180,85*math.pi/180,-47*math.pi/180,-90*math.pi/180,0]
+    targetVel=[-0.5*math.pi/180,-0.5*math.pi/180,-0.5*math.pi/180,-0.5*math.pi/180,-0.5*math.pi/180,-0.5*math.pi/180]
     movementData={"id":"movSeq2","type":"mov","targetConfig":targetConfig,"targetVel":targetVel,"maxVel":maxVel,"maxAccel":maxAccel}
     packedMovementData=msgpack.packb(movementData)
-    sim.simxCallScriptFunction(clientID,targetArm,sim.sim_scripttype_childscript,'legacyRapiMovementDataFunction',[],[],[],packedMovementData,sim.simx_opmode_oneshot)
+    sim.simxCallScriptFunction(clientID,targetArm1,sim.sim_scripttype_childscript,'legacyRapiMovementDataFunction',[],[],[],packedMovementData,sim.simx_opmode_oneshot)
     
     # Send third movement sequence
     # Go to Corner 2
-    targetConfig=[0,0,0,0,0,0] 
-    targetVel=[0,0,0,0,0,0]
+    targetConfig=[-20*math.pi/180,46*math.pi/180,85*math.pi/180,-48*math.pi/180,-90*math.pi/180,0]
+    targetVel=[-0.5*math.pi/180,-0.5*math.pi/180,-0.5*math.pi/180,-0.5*math.pi/180,-0.5*math.pi/180,-0.5*math.pi/180]
     movementData={"id":"movSeq3","type":"mov","targetConfig":targetConfig,"targetVel":targetVel,"maxVel":maxVel,"maxAccel":maxAccel}
     packedMovementData=msgpack.packb(movementData)
-    sim.simxCallScriptFunction(clientID,targetArm,sim.sim_scripttype_childscript,'legacyRapiMovementDataFunction',[],[],[],packedMovementData,sim.simx_opmode_oneshot)
+    sim.simxCallScriptFunction(clientID,targetArm1,sim.sim_scripttype_childscript,'legacyRapiMovementDataFunction',[],[],[],packedMovementData,sim.simx_opmode_oneshot)
     
     # Send fourth movement sequence
-    # Go to Corner 3
-    targetConfig=[0,0,0,0,0,0] 
-    targetVel=[0,0,0,0,0,0]
+    # Intermediary move; lift up and rotate a bit to gain clearance
+    targetConfig=[-27*math.pi/180,30*math.pi/180,85*math.pi/180,-70*math.pi/180,-90*math.pi/180,0]
+    targetVel=[-0.5*math.pi/180,-0.5*math.pi/180,-0.5*math.pi/180,-0.5*math.pi/180,-0.5*math.pi/180,-0.5*math.pi/180]
     movementData={"id":"movSeq4","type":"mov","targetConfig":targetConfig,"targetVel":targetVel,"maxVel":maxVel,"maxAccel":maxAccel}
     packedMovementData=msgpack.packb(movementData)
-    sim.simxCallScriptFunction(clientID,targetArm,sim.sim_scripttype_childscript,'legacyRapiMovementDataFunction',[],[],[],packedMovementData,sim.simx_opmode_oneshot)
+    sim.simxCallScriptFunction(clientID,targetArm1,sim.sim_scripttype_childscript,'legacyRapiMovementDataFunction',[],[],[],packedMovementData,sim.simx_opmode_oneshot)
     
     # Send fifth movement sequence
-    # Go to Corner 4
-    targetConfig=[0,0,0,0,0,0] 
-    targetVel=[0,0,0,0,0,0]
+    # Go to Corner 3
+    targetConfig=[-26*math.pi/180,30*math.pi/180,117*math.pi/180,-66*math.pi/180,-90*math.pi/180,0]
+    targetVel=[-0.5*math.pi/180,-0.5*math.pi/180,-0.5*math.pi/180,-0.5*math.pi/180,-0.5*math.pi/180,-0.5*math.pi/180]
     movementData={"id":"movSeq5","type":"mov","targetConfig":targetConfig,"targetVel":targetVel,"maxVel":maxVel,"maxAccel":maxAccel}
     packedMovementData=msgpack.packb(movementData)
-    sim.simxCallScriptFunction(clientID,targetArm,sim.sim_scripttype_childscript,'legacyRapiMovementDataFunction',[],[],[],packedMovementData,sim.simx_opmode_oneshot)
+    sim.simxCallScriptFunction(clientID,targetArm1,sim.sim_scripttype_childscript,'legacyRapiMovementDataFunction',[],[],[],packedMovementData,sim.simx_opmode_oneshot)
     
-    # Send sixth and last movement sequence
-    # Go back to origin
-    targetConfig=[0,0,0,0,0,0] 
-    targetVel=[0,0,0,0,0,0]
+    # Send sixth movement sequence
+    # Go to Corner 4
+    targetConfig=[-11*math.pi/180,30*math.pi/180,117*math.pi/180,-66*math.pi/180,-90*math.pi/180,0]
+    targetVel=[-0.5*math.pi/180,-0.5*math.pi/180,-0.5*math.pi/180,-0.5*math.pi/180,-0.5*math.pi/180,-0.5*math.pi/180]
     movementData={"id":"movSeq6","type":"mov","targetConfig":targetConfig,"targetVel":targetVel,"maxVel":maxVel,"maxAccel":maxAccel}
     packedMovementData=msgpack.packb(movementData)
-    sim.simxCallScriptFunction(clientID,targetArm,sim.sim_scripttype_childscript,'legacyRapiMovementDataFunction',[],[],[],packedMovementData,sim.simx_opmode_oneshot)    
+    sim.simxCallScriptFunction(clientID,targetArm1,sim.sim_scripttype_childscript,'legacyRapiMovementDataFunction',[],[],[],packedMovementData,sim.simx_opmode_oneshot)    
     
-    time.sleep(2)
+    # Send seventh movement sequence
+    # Go back to origin
+    targetConfig=[0,0,0,0,0,0]
+    targetVel=[-0.5*math.pi/180,-0.5*math.pi/180,-0.5*math.pi/180,-0.5*math.pi/180,-0.5*math.pi/180,-0.5*math.pi/180]
+    movementData={"id":"movSeq7","type":"mov","targetConfig":targetConfig,"targetVel":targetVel,"maxVel":maxVel,"maxAccel":maxAccel}
+    packedMovementData=msgpack.packb(movementData)
+    sim.simxCallScriptFunction(clientID,targetArm1,sim.sim_scripttype_childscript,'legacyRapiMovementDataFunction',[],[],[],packedMovementData,sim.simx_opmode_oneshot)        
+    
+    time.sleep(1)
     
     
     # Execute movement sequences:
-    sim.simxCallScriptFunction(clientID,targetArm,sim.sim_scripttype_childscript,'legacyRapiExecuteMovement',[],[],[],'movSeq1',sim.simx_opmode_oneshot)
+    sim.simxCallScriptFunction(clientID,targetArm1,sim.sim_scripttype_childscript,'legacyRapiExecuteMovement',[],[],[],'movSeq1',sim.simx_opmode_oneshot)
     waitForMovementExecuted('movSeq1') 
     sim.simxAddStatusbarMessage(clientID,'Movement 1 executed!',sim.simx_opmode_oneshot) # show status bar message in Coppelia    
     
-    time.sleep(2)
-    sim.simxCallScriptFunction(clientID,targetArm,sim.sim_scripttype_childscript,'legacyRapiExecuteMovement',[],[],[],'movSeq2',sim.simx_opmode_oneshot)
+    time.sleep(1)
+    sim.simxCallScriptFunction(clientID,targetArm1,sim.sim_scripttype_childscript,'legacyRapiExecuteMovement',[],[],[],'movSeq2',sim.simx_opmode_oneshot)
     waitForMovementExecuted('movSeq2')
     sim.simxAddStatusbarMessage(clientID,'Movement 2 executed!',sim.simx_opmode_oneshot) # show status bar message in Coppelia
     
-    time.sleep(2)
-    sim.simxCallScriptFunction(clientID,targetArm,sim.sim_scripttype_childscript,'legacyRapiExecuteMovement',[],[],[],'movSeq3',sim.simx_opmode_oneshot)
+    time.sleep(1)
+    sim.simxCallScriptFunction(clientID,targetArm1,sim.sim_scripttype_childscript,'legacyRapiExecuteMovement',[],[],[],'movSeq3',sim.simx_opmode_oneshot)
     waitForMovementExecuted('movSeq3')
     sim.simxAddStatusbarMessage(clientID,'Movement 3 executed!',sim.simx_opmode_oneshot) # show status bar message in Coppelia    
 
-    time.sleep(2)
-    sim.simxCallScriptFunction(clientID,targetArm,sim.sim_scripttype_childscript,'legacyRapiExecuteMovement',[],[],[],'movSeq3',sim.simx_opmode_oneshot)
+    time.sleep(1)
+    sim.simxCallScriptFunction(clientID,targetArm1,sim.sim_scripttype_childscript,'legacyRapiExecuteMovement',[],[],[],'movSeq4',sim.simx_opmode_oneshot)
     waitForMovementExecuted('movSeq4')
     sim.simxAddStatusbarMessage(clientID,'Movement 4 executed!',sim.simx_opmode_oneshot) # show status bar message in Coppelia        
     
-    time.sleep(5)
-    sim.simxCallScriptFunction(clientID,targetArm,sim.sim_scripttype_childscript,'legacyRapiExecuteMovement',[],[],[],'movSeq3',sim.simx_opmode_oneshot)
+    time.sleep(0.5)
+    sim.simxCallScriptFunction(clientID,targetArm1,sim.sim_scripttype_childscript,'legacyRapiExecuteMovement',[],[],[],'movSeq5',sim.simx_opmode_oneshot)
     waitForMovementExecuted('movSeq5')
     sim.simxAddStatusbarMessage(clientID,'Movement 5 executed!',sim.simx_opmode_oneshot) # show status bar message in Coppelia
     
-    time.sleep(5)
-    sim.simxCallScriptFunction(clientID,targetArm,sim.sim_scripttype_childscript,'legacyRapiExecuteMovement',[],[],[],'movSeq3',sim.simx_opmode_oneshot)
+    time.sleep(1)
+    sim.simxCallScriptFunction(clientID,targetArm1,sim.sim_scripttype_childscript,'legacyRapiExecuteMovement',[],[],[],'movSeq6',sim.simx_opmode_oneshot)
     waitForMovementExecuted('movSeq6')
-    sim.simxAddStatusbarMessage(clientID,'Movement 6 executed!',sim.simx_opmode_oneshot) # show status bar message in Coppelia    
+    sim.simxAddStatusbarMessage(clientID,'Movement 6 executed!',sim.simx_opmode_oneshot) # show status bar message in Coppelia  
+    
+    time.sleep(1)
+    sim.simxCallScriptFunction(clientID,targetArm1,sim.sim_scripttype_childscript,'legacyRapiExecuteMovement',[],[],[],'movSeq7',sim.simx_opmode_oneshot)
+    waitForMovementExecuted('movSeq7')
+    sim.simxAddStatusbarMessage(clientID,'Movement 7 executed!',sim.simx_opmode_oneshot) # show status bar message in Coppelia        
     
     sim.simxGetPingTime(clientID)
     sim.simxFinish(clientID)
