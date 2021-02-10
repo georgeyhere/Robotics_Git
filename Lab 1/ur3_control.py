@@ -2,7 +2,7 @@ print("Program started.")
 
 
 try:
-    import sim as vrep
+    import sim 
 except:
     print ('--------------------------------------------------------------')
     print ('"sim.py" could not be imported. This means very probably that')
@@ -13,44 +13,137 @@ except:
     print ('')    
 
 import time
-vrep.simxFinish(-1)
-clientID=vrep.simxStart('127.0.0.1',19999,True,True,5000,5)
+import math
+import msgpack
 
-if clientID!=-1:
+sim.simxFinish(-1)
+clientID=sim.simxStart('127.0.0.1',19990,True,True,5000,5)
+
+if clientID!=-1: # server connected
     print("Connected to remote API server")
+    sim.simxAddStatusbarMessage(clientID,'Remote API server connected!',sim.simx_opmode_oneshot) # show status bar message in Coppelia
     
-    res,objs=vrep.simxGetObjects(clientID,vrep.sim_handle_all,vrep.simx_opmode_blocking)
-    if res==vrep.simx_return_ok:
-        print('Number of objects in the scene: ',len(objs))
+    res,objs=sim.simxGetObjects(clientID,sim.sim_handle_all,sim.simx_opmode_blocking) # call simxGetObjects
+    if res==sim.simx_return_ok: # when data valid
+        print('Number of objects in the scene: ',len(objs)) # display data
     else:
         print('Remote API function call returned with error code: ',res)
     
+    executedMovId='notReady' 
+    targetArm='UR3' 
+    stringSignalName=targetArm+'_executedMovId'
+    
+    def waitForMovementExecuted(id): # checks if returned code is same as executed movement to determine if movement has been executed
+        global executedMovId
+        global stringSignalName
+        while executedMovId!=id: # if executed move ID is not expected:
+            retCode,s=sim.simxGetStringSignal(clientID,stringSignalName,sim.simx_opmode_buffer) 
+            if retCode==sim.simx_return_ok:
+                if type(s)==bytearray:
+                    s=s.decode('ascii') # decode string to ascii if valid
+                executedMovId=s
+     
+                
+    # Start streaming stringSignalName string signal:
+    sim.simxGetStringSignal(clientID,stringSignalName,sim.simx_opmode_streaming)
+    
+    # setup movement variables:
+    mVel=100*math.pi/180 # convert from degrees to radians
+    mAccel = 150*math.pi/180
+    maxVel=[mVel,mVel,mVel,mVel,mVel,mVel] # set all joints to have same max velocity and acceleration
+    maxAccel=[mAccel,mAccel,mAccel,mAccel,mAccel,mAccel] 
+    targetVel=[0,0,0,0,0,0] # set initial target velocity = 0   
+    
+    # Start simulation: (necessary?)
+    sim.simxStartSimulation(clientID,sim.simx_opmode_blocking)  
+    
+    waitForMovementExecuted('ready')
+    
+    
+    # Send first movement sequence:
+    # Go to center of cuboid
+    targetConfig=[90*math.pi/180,90*math.pi/180,0,0,0,0]
+    targetVel=[-20*math.pi/180,-20*math.pi/180,0,0,0,0]
+    movementData={"id":"movSeq1","type":"mov","targetConfig":targetConfig,"targetVel":targetVel,"maxVel":maxVel,"maxAccel":maxAccel}
+    packedMovementData=msgpack.packb(movementData)
+    sim.simxCallScriptFunction(clientID,targetArm,sim.sim_scripttype_childscript,'legacyRapiMovementDataFunction',[],[],[],packedMovementData,sim.simx_opmode_oneshot)    
+    
+    
+    # Send second movement sequence:
+    # Go to Corner 1
+    targetConfig=[90*math.pi/180,90*math.pi/180,0,0,0,0]
+    targetVel=[-20*math.pi/180,-20*math.pi/180,0,0,0,0]
+    movementData={"id":"movSeq2","type":"mov","targetConfig":targetConfig,"targetVel":targetVel,"maxVel":maxVel,"maxAccel":maxAccel}
+    packedMovementData=msgpack.packb(movementData)
+    sim.simxCallScriptFunction(clientID,targetArm,sim.sim_scripttype_childscript,'legacyRapiMovementDataFunction',[],[],[],packedMovementData,sim.simx_opmode_oneshot)
+    
+    # Send third movement sequence
+    # Go to Corner 2
+    targetConfig=[0,0,0,0,0,0] 
+    targetVel=[0,0,0,0,0,0]
+    movementData={"id":"movSeq3","type":"mov","targetConfig":targetConfig,"targetVel":targetVel,"maxVel":maxVel,"maxAccel":maxAccel}
+    packedMovementData=msgpack.packb(movementData)
+    sim.simxCallScriptFunction(clientID,targetArm,sim.sim_scripttype_childscript,'legacyRapiMovementDataFunction',[],[],[],packedMovementData,sim.simx_opmode_oneshot)
+    
+    # Send fourth movement sequence
+    # Go to Corner 3
+    targetConfig=[0,0,0,0,0,0] 
+    targetVel=[0,0,0,0,0,0]
+    movementData={"id":"movSeq4","type":"mov","targetConfig":targetConfig,"targetVel":targetVel,"maxVel":maxVel,"maxAccel":maxAccel}
+    packedMovementData=msgpack.packb(movementData)
+    sim.simxCallScriptFunction(clientID,targetArm,sim.sim_scripttype_childscript,'legacyRapiMovementDataFunction',[],[],[],packedMovementData,sim.simx_opmode_oneshot)
+    
+    # Send fifth movement sequence
+    # Go to Corner 4
+    targetConfig=[0,0,0,0,0,0] 
+    targetVel=[0,0,0,0,0,0]
+    movementData={"id":"movSeq5","type":"mov","targetConfig":targetConfig,"targetVel":targetVel,"maxVel":maxVel,"maxAccel":maxAccel}
+    packedMovementData=msgpack.packb(movementData)
+    sim.simxCallScriptFunction(clientID,targetArm,sim.sim_scripttype_childscript,'legacyRapiMovementDataFunction',[],[],[],packedMovementData,sim.simx_opmode_oneshot)
+    
+    # Send sixth and last movement sequence
+    # Go back to origin
+    targetConfig=[0,0,0,0,0,0] 
+    targetVel=[0,0,0,0,0,0]
+    movementData={"id":"movSeq6","type":"mov","targetConfig":targetConfig,"targetVel":targetVel,"maxVel":maxVel,"maxAccel":maxAccel}
+    packedMovementData=msgpack.packb(movementData)
+    sim.simxCallScriptFunction(clientID,targetArm,sim.sim_scripttype_childscript,'legacyRapiMovementDataFunction',[],[],[],packedMovementData,sim.simx_opmode_oneshot)    
+    
     time.sleep(2)
-    vrep.simxAddStatusbarMessage(clientID,'API getting joint handles...',vrep.simx_opmode_oneshot)
     
-    # get joint handles
-    err_code,joint1_handle = vrep.simxGetObjectHandle(clientID, "UR3_joint1", vrep.simx_opmode_blocking)
-    err_code,joint2_handle = vrep.simxGetObjectHandle(clientID, "UR3_joint2", vrep.simx_opmode_blocking)
-    err_code,joint3_handle = vrep.simxGetObjectHandle(clientID, "UR3_joint3", vrep.simx_opmode_blocking)
-    err_code,joint4_handle = vrep.simxGetObjectHandle(clientID, "UR3_joint4", vrep.simx_opmode_blocking)
-    err_code,joint5_handle = vrep.simxGetObjectHandle(clientID, "UR3_joint5", vrep.simx_opmode_blocking)
-    err_code,joint6_handle = vrep.simxGetObjectHandle(clientID, "UR3_joint6", vrep.simx_opmode_blocking)
     
-    vrep.simxAddStatusbarMessage(clientID,'Going to Position 1.',vrep.simx_opmode_oneshot)
-   
-    vrep.simxSetJointTargetPosition(clientID,joint1_handle,2,vrep.simx_opmode_oneshot)
-    # startTime=time.time() # set start time
+    # Execute movement sequences:
+    sim.simxCallScriptFunction(clientID,targetArm,sim.sim_scripttype_childscript,'legacyRapiExecuteMovement',[],[],[],'movSeq1',sim.simx_opmode_oneshot)
+    waitForMovementExecuted('movSeq1') 
+    sim.simxAddStatusbarMessage(clientID,'Movement 1 executed!',sim.simx_opmode_oneshot) # show status bar message in Coppelia    
     
-    # while time.time()-startTime < 30:
-        # returnCode,data=vrep.simxGetJointPosition(clientID,joint1_handle,vrep.simx_opmode_streaming)
-        # if returnCode==vrep.simx_return_ok:
-           # print('UR3_joint1 position: ',data)
-        # time.sleep(0.05)
- 
+    time.sleep(2)
+    sim.simxCallScriptFunction(clientID,targetArm,sim.sim_scripttype_childscript,'legacyRapiExecuteMovement',[],[],[],'movSeq2',sim.simx_opmode_oneshot)
+    waitForMovementExecuted('movSeq2')
+    sim.simxAddStatusbarMessage(clientID,'Movement 2 executed!',sim.simx_opmode_oneshot) # show status bar message in Coppelia
+    
+    time.sleep(2)
+    sim.simxCallScriptFunction(clientID,targetArm,sim.sim_scripttype_childscript,'legacyRapiExecuteMovement',[],[],[],'movSeq3',sim.simx_opmode_oneshot)
+    waitForMovementExecuted('movSeq3')
+    sim.simxAddStatusbarMessage(clientID,'Movement 3 executed!',sim.simx_opmode_oneshot) # show status bar message in Coppelia    
+
+    time.sleep(2)
+    sim.simxCallScriptFunction(clientID,targetArm,sim.sim_scripttype_childscript,'legacyRapiExecuteMovement',[],[],[],'movSeq3',sim.simx_opmode_oneshot)
+    waitForMovementExecuted('movSeq4')
+    sim.simxAddStatusbarMessage(clientID,'Movement 4 executed!',sim.simx_opmode_oneshot) # show status bar message in Coppelia        
+    
     time.sleep(5)
+    sim.simxCallScriptFunction(clientID,targetArm,sim.sim_scripttype_childscript,'legacyRapiExecuteMovement',[],[],[],'movSeq3',sim.simx_opmode_oneshot)
+    waitForMovementExecuted('movSeq5')
+    sim.simxAddStatusbarMessage(clientID,'Movement 5 executed!',sim.simx_opmode_oneshot) # show status bar message in Coppelia
     
-    vrep.simxGetPingTime(clientID)
-    vrep.simxFinish(clientID)
+    time.sleep(5)
+    sim.simxCallScriptFunction(clientID,targetArm,sim.sim_scripttype_childscript,'legacyRapiExecuteMovement',[],[],[],'movSeq3',sim.simx_opmode_oneshot)
+    waitForMovementExecuted('movSeq6')
+    sim.simxAddStatusbarMessage(clientID,'Movement 6 executed!',sim.simx_opmode_oneshot) # show status bar message in Coppelia    
+    
+    sim.simxGetPingTime(clientID)
+    sim.simxFinish(clientID)
     
     
 else:
